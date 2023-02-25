@@ -6,13 +6,24 @@ class Ship {
   }
 
   attackEnemy(enemyShip) {
-    if (this.accuracy > enemyShip.accuracy) {
-      console.log(
-        '%c......WELL DONE.....SUCCESSFUL HIT USS-ASSEMBLY......',
-        'color:green; font-size:1.5rem'
-      );
-      enemyShip.hull = enemyShip.hull - enemyShip.firepower;
-      console.log(enemyShip.hull);
+    let humanAttacks = 0;
+    let alienAttacks = 0;
+
+    while (enemyShip.hull > 0 && this.hull > 0) {
+      if (this.accuracy > enemyShip.accuracy) {
+        enemyShip.hull = enemyShip.hull - enemyShip.firepower;
+        humanAttacks++;
+        console.log('human');
+      } else {
+        this.hull = this.hull - this.firepower;
+        alienAttacks++;
+        console.log('enemy');
+      }
+    }
+    if (humanAttacks > alienAttacks) {
+      return 'human';
+    } else {
+      return 'alien';
     }
   }
 
@@ -36,17 +47,20 @@ const creatAlienShips = (noOfShips) => {
 };
 
 const startNewGame = (humanShip, alienShips) => {
+  let destroyedShips = 0;
+
   for (let i = 0; i < alienShips.length; i++) {
-    console.log(alienShips[i]);
-    console.log('alien before attack ' + alienShips[i].hull);
-    if (humanShip.accuracy > alienShips[i].accuracy) {
-      alienShips[i].hull = alienShips[i].hull - alienShips[i].firepower;
-      console.log('alien after attack ' + alienShips[i].hull);
-    } else if (humanShip.accuracy < alienShips[i].accuracy) {
-      humanShip.hull = humanShip.hull - humanShip.firepower;
-      console.log('human after attack ' + humanShip.hull);
+    const winner = humanShip.attackEnemy(alienShips[i]);
+    if (winner === 'human') {
+      destroyedShips++;
+      console.log(destroyedShips);
+      humanShip.attackEnemy(alienShips[i + 1]);
     }else{
-        console.log('Tie ' + humanShip.hull + ', ' + alienShips[i].hull);
+        console.log('THE UNIVERSE IS DONE');
+        break;
+    }
+    if (destroyedShips > 3) {
+      console.log('THE UNIVERSE IS SAVED');
     }
   }
 };
@@ -54,9 +68,6 @@ const startNewGame = (humanShip, alienShips) => {
 const ussAssembly = new Ship(20, 5, 0.7); // hardcoded since the human-ship have specific values
 
 const alienShips = creatAlienShips(6);
-console.log(alienShips);
-
-// ussAssembly.attackEnemy(alienShips[0]);
 
 startNewGame(ussAssembly, alienShips);
 
